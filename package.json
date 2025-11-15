@@ -1,6 +1,6 @@
 {
   "name": "@gerbergpt/medusa-mailjet",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Mailjet email delivery service for Medusa V2",
   "author": "TONYLABS <tony.wang@tonylabs.com>",
   "license": "MIT",
