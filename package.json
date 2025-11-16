@@ -1,6 +1,7 @@
 {
   "name": "@gerbergpt/medusa-mailjet",
   "version": "1.0.1",
+  "displayName": "Medusa v2 Mailjet Notification Plugin",
   "description": "Mailjet email delivery service for Medusa V2",
   "author": "TONYLABS <tony.wang@tonylabs.com>",
   "license": "MIT",
@@ -17,12 +18,7 @@
     "./.medusa/server/src/modules/*": "./.medusa/server/src/modules/*/index.js",
     "./modules/*": "./.medusa/server/src/modules/*/index.js",
     "./providers/*": "./.medusa/server/src/providers/*/index.js",
-    "./*": "./.medusa/server/src/*.js",
-    "./admin": {
-      "import": "./.medusa/server/src/admin/index.mjs",
-      "require": "./.medusa/server/src/admin/index.js",
-      "default": "./.medusa/server/src/admin/index.js"
-    }
+    "./*": "./.medusa/server/src/*.js"
   },
   "keywords": [
     "medusa",
@@ -30,12 +26,18 @@
     "medusa-plugin",
     "mailjet",
     "email",
-    "notification"
+    "notification",
+    "marketing"
   ],
   "scripts": {
     "build": "medusa plugin:build",
     "dev": "medusa plugin:develop",
     "prepublishOnly": "medusa plugin:build"
+  },
+  "dependencies": {
+    "@medusajs/admin-shared": "2.11.3",
+    "@react-email/components": "^1.0.1",
+    "node-mailjet": "^6.0.11"
   },
   "devDependencies": {
     "@medusajs/admin-sdk": "2.11.3",
@@ -45,13 +47,13 @@
     "@medusajs/medusa": "2.11.3",
     "@medusajs/test-utils": "2.11.3",
     "@medusajs/ui": "4.0.25",
-    "@swc/core": "1.5.7",
-    "@types/node": "^20.0.0",
+    "@swc/core": "^1.7.28",
+    "@types/node": "^20.12.11",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.2.25",
     "prop-types": "^15.8.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
     "vite": "^5.4.14",
@@ -69,8 +71,5 @@
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
-    "@react-email/components": "^1.0.1",
-    "node-mailjet": "^6.0.11"
-  }
+  "packageManager": "yarn@1.22.0"
 }
