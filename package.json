@@ -1,13 +1,13 @@
 {
-  "name": "@gerbergpt/medusa-mailjet",
-  "version": "1.1.0",
+  "name": "@gerbergpt/medusa-notifications-mailjet",
+  "version": "1.0.0",
   "displayName": "Medusa v2 Mailjet Notification Plugin",
   "description": "Mailjet email delivery service for Medusa V2",
   "author": "TONYLABS <tony.wang@tonylabs.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tonylabs/medusa-mailjet"
+    "url": "https://github.com/tonylabs/medusa-notifications-mailjet"
   },
   "files": [
     ".medusa/server"
