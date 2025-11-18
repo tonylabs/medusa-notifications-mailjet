@@ -52,7 +52,7 @@ This starter is compatible with versions >= 2.11.x of `@medusajs/medusa`.
 
 ## Installation
 ```bash
-pnpm add @gerbergpt/medusa-mailjet
+pnpm add @gerbergpt/medusa-notifications-mailjet
 ```
 
 ## Configuration
@@ -71,7 +71,7 @@ module.exports = defineConfig({
         providers: [
           {
             id: "notification-mailjet",
-            resolve: "@gerbergpt/medusa-mailjet/providers/notifications-mailjet",
+            resolve: "@gerbergpt/medusa-notifications-mailjet/providers/notifications-mailjet",
             options: {
               channels: ["email"],
               api_key: process.env.MAILJET_API_KEY,
