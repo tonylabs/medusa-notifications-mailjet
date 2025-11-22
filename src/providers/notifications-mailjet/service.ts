@@ -1,33 +1,27 @@
 import { AbstractNotificationProviderService, MedusaError } from "@medusajs/framework/utils"
 import { Attachment, Logger, ProviderSendNotificationDTO, ProviderSendNotificationResultsDTO } from "@medusajs/framework/types"
-import { render } from "@react-email/components"
-import { ReactElement } from "react"
+
+// No template rendering in provider
+
 import Mailjet, { Client as MailjetClient, SendEmailV3_1 } from "node-mailjet"
+
+// Workflows provide email content; provider does not manage templates
 
 type InjectedDependencies = {
   logger: Logger
 }
 
-export type TemplateFn<Props = Record<string, unknown>> = (props: Props) => ReactElement
-
-export type SubjectFn<Props = Record<string, unknown>> = (locale: string, data?: Props) => string
-
-type TemplateConfig<Props = Record<string, unknown>> = {
-  subject: SubjectFn<Props>
-  template: TemplateFn<Props>
-}
+// Removed template-related types; provider consumes pre-rendered content
 
 type Options = {
   api_key: string
   api_secret: string
   from_email: string
   from_name?: string
-  templates?: Record<string, TemplateConfig>
   default_locale?: string
 }
 
-type ResolvedOptions = Omit<Options, "templates" | "default_locale"> & {
-  templates: Record<string, TemplateConfig>
+type ResolvedOptions = Omit<Options, "default_locale"> & {
   default_locale: string
 }
 
@@ -42,8 +36,10 @@ class MailjetNotificationProviderService extends AbstractNotificationProviderSer
     super()
     this.logger = logger
     this.options = {
-      ...options,
-      templates: options.templates ?? {},
+      api_key: options.api_key,
+      api_secret: options.api_secret,
+      from_email: options.from_email,
+      from_name: options.from_name,
       default_locale: options.default_locale ?? "en",
     }
   }
@@ -71,47 +67,46 @@ class MailjetNotificationProviderService extends AbstractNotificationProviderSer
 
   async send(notification: ProviderSendNotificationDTO): Promise<ProviderSendNotificationResultsDTO> {
     const client = this.initializeClient()
-    const templateConfig = this.options.templates[notification.template]
-
-    if (!templateConfig) {
-      throw new MedusaError(
-        MedusaError.Types.NOT_FOUND,
-        `Template ${notification.template} not found`
-      )
-    }
-
     const templateData = (notification.data ?? {}) as Record<string, unknown>
-
-    const renderedTemplate = await render(
-      templateConfig.template(templateData),
-      { pretty: true }
-    )
-
-    const localeCandidate = templateData["locale"]
-    const locale =
-      (typeof localeCandidate === "string" ? localeCandidate : undefined) ??
-      this.options.default_locale
-
-    const subject = templateConfig.subject(locale, templateData)
+    const subjectCandidate = notification.content?.subject
+    const subjectFromData = templateData["subject"]
+    const subject =
+      (typeof subjectCandidate === "string" && subjectCandidate.trim().length
+        ? subjectCandidate.trim()
+        : undefined) ??
+      (typeof subjectFromData === "string" && subjectFromData.trim().length
+        ? (subjectFromData as string).trim()
+        : undefined)
 
     if (!subject) {
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
-        `Subject for template ${notification.template} resolved to an empty value`
+        "Subject is required in notification.content.subject or data.subject"
       )
     }
+    const htmlCandidate = notification.content?.html
+    const html =
+      typeof htmlCandidate === "string" && htmlCandidate.trim().length
+        ? htmlCandidate
+        : undefined
 
     try {
       const { attachments, inlineAttachments } = this.prepareAttachments(notification)
       const textPart = this.resolveTextContent(notification, templateData)
       const replyTo = this.resolveReplyTo(templateData)
+      if (!html && !textPart) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          "Either HTML content or text content is required"
+        )
+      }
       const requestBody = {
         Messages: [
           {
             From: this.resolveFrom(notification),
             To: this.formatRecipients(notification, templateData),
             Subject: subject,
-            HTMLPart: renderedTemplate,
+            HTMLPart: html,
             TextPart: textPart,
             Attachments: attachments.length ? attachments : undefined,
             InlinedAttachments: inlineAttachments.length ? inlineAttachments : undefined,
