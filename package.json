@@ -18,6 +18,7 @@
     "./.medusa/server/src/modules/*": "./.medusa/server/src/modules/*/index.js",
     "./modules/*": "./.medusa/server/src/modules/*/index.js",
     "./providers/*": "./.medusa/server/src/providers/*/index.js",
+    "./subscribers/*": "./.medusa/server/src/subscribers/*.js",
     "./*": "./.medusa/server/src/*.js"
   },
   "keywords": [
